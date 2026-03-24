@@ -66,3 +66,10 @@ def create_app(config_class=Config):
 if __name__ == '__main__':
     app = create_app()
     app.run(host='0.0.0.0', port=8000, debug=app.config['DEBUG'])
+
+from utils.email_service import send_otp_email
+
+@app.route('/test-email')
+def test_email():
+    send_otp_email("nikita23tuteja@gmail.com", "123456")
+    return "Email sent"
