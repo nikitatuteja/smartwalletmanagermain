@@ -2,6 +2,10 @@ from flask import Blueprint, request, jsonify
 from extensions import db
 from models import User
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from utils.otp import generate_otp
+from utils.email_service import send_otp_email
+from datetime import datetime, timedelta
+from flask_jwt_extended import create_access_token
 
 auth_bp = Blueprint('auth', __name__)
 
