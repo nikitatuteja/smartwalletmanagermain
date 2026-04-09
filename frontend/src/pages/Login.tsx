@@ -25,22 +25,6 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await authService.login({ email, password });
-      if (res.success) {
-        toast.success("OTP sent to your email!");
-        setStep(2);
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Login failed. Please check your credentials.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await authService.verifyOtp({ email, otp });
       if (res.success && res.access_token) {
         signIn(res.access_token, res.user);
         toast.success(`Welcome back, ${res.user.display_name}!`);
@@ -53,7 +37,7 @@ export default function Login() {
         }
       }
     } catch (err: any) {
-      toast.error(err.message || "Invalid OTP. Please try again.");
+      toast.error(err.message || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }
@@ -85,9 +69,7 @@ export default function Login() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <AnimatePresence mode="wait">
-              {step === 1 ? (
-                <motion.form
+              <motion.form
                   key="login-step"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -128,50 +110,9 @@ export default function Login() {
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white h-11 text-lg font-semibold transition-all duration-300 shadow-lg shadow-purple-500/20" 
                     disabled={loading}
                   >
-                    {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Send OTP"}
+                    {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Login"}
                   </Button>
                 </motion.form>
-              ) : (
-                <motion.form
-                  key="verify-step"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  onSubmit={handleVerify}
-                  className="space-y-4 pt-4"
-                >
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Verification Code</Label>
-                    <Input 
-                      placeholder="Enter 6-digit OTP" 
-                      required 
-                      value={otp} 
-                      onChange={(e) => setOtp(e.target.value)}
-                      maxLength={6}
-                      className="text-center text-2xl tracking-[0.5em] h-14 bg-[#020817] border-white/10 text-white focus:ring-green-500/50"
-                    />
-                    <p className="text-xs text-center text-gray-500 mt-2">
-                      We've sent a code to <span className="text-purple-400">{email}</span>
-                    </p>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-green-600 hover:bg-green-700 text-white h-11 text-lg font-semibold transition-all duration-300 shadow-lg shadow-green-500/20" 
-                    disabled={loading}
-                  >
-                    {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Verify & Login"}
-                  </Button>
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    className="w-full text-gray-400 hover:text-white" 
-                    onClick={() => setStep(1)}
-                  >
-                    Back to Login
-                  </Button>
-                </motion.form>
-              )}
-            </AnimatePresence>
           </CardContent>
         </Card>
       </motion.div>

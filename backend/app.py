@@ -12,6 +12,7 @@ from routes.goals import goals_bp
 from routes.ai import ai_bp
 from routes.analytics import analytics_bp
 from routes.sandbox import sandbox_bp
+from routes.payment import payment_bp
 
 def create_app(config_class=Config):
     # Set static folder to frontend build directory
@@ -35,6 +36,7 @@ def create_app(config_class=Config):
     app.register_blueprint(ai_bp, url_prefix='/api/ai')
     app.register_blueprint(analytics_bp, url_prefix='/api/analytics')
     app.register_blueprint(sandbox_bp, url_prefix='/api/sandbox')
+    app.register_blueprint(payment_bp, url_prefix='/api/payment')
 
     # Serve Frontend
     @app.route('/', defaults={'path': ''})

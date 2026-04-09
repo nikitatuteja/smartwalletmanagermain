@@ -20,35 +20,78 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDashboard } from "@/contexts/DashboardContext";
-import PaymentSandboxModal from "@/components/PaymentSandboxModal";
+import { paymentService } from "@/services/index";
+import { useAuth } from "@/contexts/AuthContext";
 
 const categories = ["Food", "Fuel", "Rent", "Shopping", "Salary", "Freelance", "Utilities", "Entertainment", "Travel", "Other"];
 
 export default function Dashboard() {
   const { data, loading, refetch } = useDashboard();
+  const { user } = useAuth();
   
   // Quick Payment State
   const [isQuickPayOpen, setIsQuickPayOpen] = useState(false);
-  const [isSandboxOpen, setIsSandboxOpen] = useState(false);
   const [quickPayAmount, setQuickPayAmount] = useState("");
   const [quickPayCategory, setQuickPayCategory] = useState("Shopping");
   const [quickPayNotes, setQuickPayNotes] = useState("");
 
-  const handleQuickPaySubmit = (e: React.FormEvent) => {
+  const handleQuickPaySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!quickPayAmount || parseFloat(quickPayAmount) <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
-    setIsQuickPayOpen(false);
-    setIsSandboxOpen(true);
-  };
-
-  const handleSandboxSuccess = () => {
-    toast.success("Payment successful and transaction recorded!");
-    setQuickPayAmount("");
-    setQuickPayNotes("");
-    refetch(); // Refetch dashboard data
+    
+    try {
+      const orderRes = await paymentService.createOrder({ amount: parseFloat(quickPayAmount) });
+      if (orderRes.success && orderRes.order_id) {
+        setIsQuickPayOpen(false);
+        const options = {
+          key: orderRes.key_id,
+          amount: orderRes.amount,
+          currency: orderRes.currency,
+          name: "FinTrack",
+          description: quickPayNotes || `Quick Payment for ${quickPayCategory}`,
+          order_id: orderRes.order_id,
+          handler: async (response: any) => {
+            try {
+              const verifyRes = await paymentService.verifyPayment({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                amount: parseFloat(quickPayAmount),
+                notes: quickPayNotes || `Quick Payment for ${quickPayCategory}`
+              });
+              if (verifyRes.success) {
+                toast.success("Payment successful and recorded!");
+                setQuickPayAmount("");
+                setQuickPayNotes("");
+                refetch();
+              } else {
+                toast.error("Payment verification failed");
+              }
+            } catch (err: any) {
+              toast.error(err.message || "Payment verification failed");
+            }
+          },
+          prefill: {
+            email: user?.email,
+            contact: ""
+          },
+          theme: { color: "#4f46e5" }
+        };
+        
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', function (response: any){
+          toast.error(`Payment Failed: ${response.error.description}`);
+        });
+        rzp.open();
+      } else {
+        toast.error("Failed to initialize payment order");
+      }
+    } catch(err: any) {
+      toast.error(err.message || "Error processing payment");
+    }
   };
 
   if (loading) {
@@ -253,15 +296,7 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      <PaymentSandboxModal 
-        isOpen={isSandboxOpen}
-        onClose={() => setIsSandboxOpen(false)}
-        onSuccess={handleSandboxSuccess}
-        amount={parseFloat(quickPayAmount) || 0}
-        title="Quick Dashboard Payment"
-        category={quickPayCategory}
-        notes={quickPayNotes}
-      />
+
     </>
   );
 }

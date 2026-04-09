@@ -59,3 +59,7 @@ export const sandboxService = {
   processPayment: (data: any) => api.post<ApiResponse>('/sandbox/process-payment', data) as unknown as Promise<ApiResponse>,
 };
 
+export const paymentService = {
+  createOrder: (data: any) => api.post<ApiResponse>('/payment/create-order', data) as unknown as Promise<ApiResponse>,
+  verifyPayment: (data: any) => api.post<ApiResponse>('/payment/verify', data) as unknown as Promise<ApiResponse>,
+};

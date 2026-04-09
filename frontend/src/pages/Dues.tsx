@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import api from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
-import { dueService, cardService } from "@/services/index";
+import { dueService, cardService, paymentService } from "@/services/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,6 @@ import { Plus, Trash2, CalendarClock, AlertCircle, CheckCircle2 } from "lucide-r
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import PaymentSandboxModal from "@/components/PaymentSandboxModal";
 
 interface Due {
   id: number;
@@ -32,8 +31,7 @@ export default function Dues() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   
-  // Sandbox State
-  const [showSandbox, setShowSandbox] = useState(false);
+  // Payment State
   const [pendingDue, setPendingDue] = useState<Due | null>(null);
 
   // Form state
@@ -89,19 +87,61 @@ export default function Dues() {
     }
   };
 
-  const handleTogglePaid = (due: Due) => {
+  const handleTogglePaid = async (due: Due) => {
     if (!due.is_paid) {
       setPendingDue(due);
-      setShowSandbox(true);
+      
+      try {
+        const orderRes: any = await paymentService.createOrder({ amount: due.amount });
+        if (orderRes.success && orderRes.order_id) {
+          const options = {
+            key: orderRes.key_id,
+            amount: orderRes.amount,
+            currency: orderRes.currency,
+            name: "FinTrack",
+            description: `Payment for Due: ${cards.find(c => c.id === due.card_id)?.nickname || 'Card'}`,
+            order_id: orderRes.order_id,
+            handler: async (response: any) => {
+              try {
+                const verifyRes = await paymentService.verifyPayment({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  due_id: due.id
+                });
+                if (verifyRes.success) {
+                  toast.success("Payment Successful!");
+                  fetchData();
+                } else {
+                  toast.error("Payment verification failed");
+                }
+              } catch (err: any) {
+                toast.error(err.message || "Payment verification failed");
+              }
+            },
+            prefill: {
+              email: user?.email,
+              contact: ""
+            },
+            theme: {
+              color: "#4f46e5"
+            }
+          };
+          
+          const rzp = new (window as any).Razorpay(options);
+          rzp.on('payment.failed', function (response: any){
+            toast.error(`Payment Failed: ${response.error.description}`);
+          });
+          rzp.open();
+        } else {
+          toast.error("Failed to initialize payment");
+        }
+      } catch (err: any) {
+        toast.error(err.message || "Could not connect to payment gateway");
+      }
+      
     } else {
       executeTogglePaid(due);
-    }
-  };
-
-  const handleSandboxSuccess = () => {
-    if (pendingDue) {
-      executeTogglePaid(pendingDue);
-      setPendingDue(null);
     }
   };
 
@@ -159,13 +199,7 @@ export default function Dues() {
         </Dialog>
       </div>
 
-      <PaymentSandboxModal 
-        isOpen={showSandbox} 
-        onClose={() => setShowSandbox(false)} 
-        onSuccess={handleSandboxSuccess} 
-        amount={pendingDue?.amount || 0} 
-        title={`Card Due: ${cards.find(c => c.id === pendingDue?.card_id)?.nickname || 'Card'}`} 
-      />
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <AnimatePresence>
