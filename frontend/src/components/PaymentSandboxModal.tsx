@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { sandboxService } from "@/services/index";
+import { sandboxService, paymentService } from "@/services/index";
 
 export type Transaction = {
   id: number;
@@ -41,6 +41,12 @@ interface PaymentSandboxModalProps {
 
 type PaymentStep = 'selection' | 'details' | 'processing' | 'success';
 type PaymentMethod = 'card' | 'upi' | 'netbanking';
+
+const paymentMethodMap: Record<PaymentMethod, "Card" | "UPI" | "Card"> = {
+  card: 'Card',
+  upi: 'UPI',
+  netbanking: 'Card'
+};
 
 export default function PaymentSandboxModal({ 
   isOpen, 
@@ -69,6 +75,77 @@ export default function PaymentSandboxModal({
     setLoading(true);
     setErrorMessage(null);
     
+    if (method === 'upi') {
+      try {
+        const orderRes: any = await paymentService.createOrder({ amount });
+        if (orderRes.success && orderRes.order_id) {
+          const options = {
+            key: orderRes.key_id,
+            amount: orderRes.amount,
+            currency: orderRes.currency,
+            name: "FinTrack",
+            description: `Payment for ${title}`,
+            order_id: orderRes.order_id,
+            handler: async (response: any) => {
+              try {
+                const verifyRes = await paymentService.verifyPayment({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  amount: amount,
+                  notes: notes
+                });
+                if (verifyRes.success) {
+                  toast.success("Payment Successful!");
+                  setStep('success');
+                  await new Promise(resolve => setTimeout(resolve, 1500));
+                  
+                  const payload = {
+                    amount,
+                    category,
+                    payment_method: 'UPI',
+                    notes: `${title}: ${notes}`
+                  };
+                  
+                  onSuccess(payload as any);
+                  onClose();
+                } else {
+                  throw new Error("Payment verification failed");
+                }
+              } catch (err: any) {
+                setLoading(false);
+                setErrorMessage(err.message || "Payment verification failed");
+                setStep('details');
+                toast.error(err.message || "Payment verification failed");
+              }
+            },
+            prefill: {
+              email: "test@example.com",
+              contact: ""
+            },
+            theme: {
+              color: "#4f46e5"
+            }
+          };
+          
+          const rzp = new (window as any).Razorpay(options);
+          rzp.on('payment.failed', function (response: any){
+            setLoading(false);
+            setStep('details');
+            setErrorMessage(`Payment Failed: ${response.error.description}`);
+          });
+          rzp.open();
+        } else {
+          throw new Error("Failed to initialize payment");
+        }
+      } catch (err: any) {
+        setLoading(false);
+        setErrorMessage(err.message || "Could not connect to payment gateway");
+        setStep('details');
+      }
+      return;
+    }
+
     const payload = {
       amount,
       category,
@@ -86,7 +163,7 @@ export default function PaymentSandboxModal({
         setStep('success');
         await new Promise(resolve => setTimeout(resolve, 1500));
         onSuccess(res.data);
-        refetch(); // Refetch dashboard data
+        // Removed refetch(); since it's not defined
         onClose();
       } else {
         throw new Error(res.error || "Payment failed");

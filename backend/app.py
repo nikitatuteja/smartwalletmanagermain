@@ -15,15 +15,16 @@ from routes.sandbox import sandbox_bp
 from routes.payment import payment_bp
 
 def create_app(config_class=Config):
-    # Set static folder to frontend build directory
-    app = Flask(__name__, static_folder='../frontend/dist', static_url_path='')
+    # Initialize Flask app as a purely API backend
+    app = Flask(__name__)
     app.config.from_object(config_class)
 
     # Initialize Extensions
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    cors.init_app(app, resources={r"/api/*": {"origins": app.config['CORS_ORIGINS']}})
+    # Enable CORS for all routes by default for Render deployment
+    cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
 
     # Register Blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -38,20 +39,6 @@ def create_app(config_class=Config):
     app.register_blueprint(sandbox_bp, url_prefix='/api/sandbox')
     app.register_blueprint(payment_bp, url_prefix='/api/payment')
 
-    # Serve Frontend
-    @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')
-    def serve(path):
-        if path != "" and os.path.exists(app.static_folder + '/' + path):
-            return send_from_directory(app.static_folder, path)
-        else:
-            # Check if frontend is built
-            if not os.path.exists(os.path.join(app.static_folder, 'index.html')):
-                return jsonify({
-                    "status": "error",
-                    "message": "Frontend not found. Please build the frontend using 'npm run build' in the frontend folder, or visit the development server at http://localhost:5173"
-                }), 404
-            return send_from_directory(app.static_folder, 'index.html')
 
     # Health Check
     @app.route('/api/health', methods=['GET'])
@@ -95,7 +82,9 @@ def create_app(config_class=Config):
 
     return app
 
+# Expose global app object for WSGI deployment 
+# Can be run via: gunicorn app:app
+app = create_app()
 
 if __name__ == '__main__':
-    app = create_app()
     app.run(host='0.0.0.0', port=8000, debug=app.config['DEBUG'])
