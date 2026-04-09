@@ -1,5 +1,7 @@
 import os
-from flask import Flask, jsonify, send_from_directory
+import traceback
+from flask import Flask, jsonify, request
+from werkzeug.exceptions import HTTPException
 from config import Config
 from extensions import db, jwt, bcrypt, cors
 from routes.auth import auth_bp
@@ -39,46 +41,75 @@ def create_app(config_class=Config):
     app.register_blueprint(sandbox_bp, url_prefix='/api/sandbox')
     app.register_blueprint(payment_bp, url_prefix='/api/payment')
 
+    # Global Error Handlers for API
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        if isinstance(e, HTTPException):
+            return jsonify({"success": False, "error": e.description}), e.code
+        
+        # Log unexpected errors in development
+        if app.debug:
+            app.logger.error(f"Server Error: {traceback.format_exc()}")
+            
+        return jsonify({"success": False, "error": "An unexpected internal server error occurred."}), 500
+
+    # Custom JWTExtended error handlers
+    @jwt.unauthorized_loader
+    def missing_token_callback(error):
+        return jsonify({"success": False, "error": "Authentication token is missing"}), 401
+
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error):
+        return jsonify({"success": False, "error": "Authentication token is invalid"}), 401
+    
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        return jsonify({"success": False, "error": "Authentication token has expired"}), 401
 
     # Health Check
     @app.route('/api/health', methods=['GET'])
     def health_check():
         return jsonify({
             "status": "ok",
-            "message": "Smart Wallet API is running"
+            "message": "Smart Wallet API is running gracefully"
         }), 200
 
-    # ✅ ADDITION: TEST EMAIL ROUTE
-    from utils.email_service import send_otp_email
-
+    # Test Email Endpoint
     @app.route('/test-email')
     def test_email():
-        send_otp_email("nikita23tuteja@gmail.com", "123456")
-        return "Email sent"
+        from utils.email_service import send_otp_email
+        try:
+            send_otp_email("nikita23tuteja@gmail.com", "123456")
+            return jsonify({"success": True, "message": "Email sent"}), 200
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
 
-    # Create Database Tables
+    # Create Database Tables & Seeding
     with app.app_context():
-        db.create_all()
-        
-        # Seed test users
-        from models import User
-        
-        test_users = [
-            {"email": "admin@test.com", "password": "AdminPassword123", "role": "admin", "display_name": "Admin User"},
-            {"email": "user@test.com", "password": "UserPassword123", "role": "user", "display_name": "Standard User"}
-        ]
-        
-        for user_data in test_users:
-            if not User.query.filter_by(email=user_data["email"]).first():
-                user = User(
-                    email=user_data["email"],
-                    role=user_data["role"],
-                    display_name=user_data["display_name"]
-                )
-                user.set_password(user_data["password"])
-                db.session.add(user)
-        
-        db.session.commit()
+        try:
+            db.create_all()
+            
+            # Seed test users
+            from models import User
+            
+            test_users = [
+                {"email": "admin@test.com", "password": "AdminPassword123", "role": "admin", "display_name": "Admin User"},
+                {"email": "user@test.com", "password": "UserPassword123", "role": "user", "display_name": "Standard User"}
+            ]
+            
+            for user_data in test_users:
+                if not User.query.filter_by(email=user_data["email"]).first():
+                    user = User(
+                        email=user_data["email"],
+                        role=user_data["role"],
+                        display_name=user_data["display_name"]
+                    )
+                    user.set_password(user_data["password"])
+                    db.session.add(user)
+            
+            db.session.commit()
+        except Exception as e:
+            app.logger.error(f"Database initialization failed: {e}")
 
     return app
 
@@ -87,4 +118,4 @@ def create_app(config_class=Config):
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=app.config['DEBUG'])
+    app.run(host='0.0.0.0', port=8000, debug=app.config.get('DEBUG', False))
