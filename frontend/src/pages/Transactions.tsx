@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import PaymentSandboxModal from "@/components/PaymentSandboxModal";
 
 const categories = ["Food", "Fuel", "Rent", "Shopping", "Salary", "Freelance", "Utilities", "Entertainment", "Travel", "Other"];
 
@@ -34,10 +33,13 @@ export default function Transactions() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  
-  // Sandbox State
-  const [showSandbox, setShowSandbox] = useState(false);
-  const [pendingPayload, setPendingPayload] = useState<any>(null);
+
+  // UPI Form state
+  const [upiOpen, setUpiOpen] = useState(false);
+  const [upiAmount, setUpiAmount] = useState("");
+  const [targetUpiId, setTargetUpiId] = useState("");
+  const [upiNotes, setUpiNotes] = useState("");
+  const [upiCategory, setUpiCategory] = useState("Other");
 
   // Filters
   const [filterType, setFilterType] = useState("All");
@@ -103,19 +105,39 @@ export default function Transactions() {
       card_id: paymentMethod === "Card" && cardId ? parseInt(cardId) : null
     };
 
-    // Intercept Expense or Card Payment for sandbox
-    if (type === "Expense" || paymentMethod === "Card") {
-      setPendingPayload(payload);
-      setShowSandbox(true);
-    } else {
-      executeSubmit(payload);
-    }
+    executeSubmit(payload);
   };
 
-  const handleSandboxSuccess = () => {
-    if (pendingPayload) {
-      executeSubmit(pendingPayload);
-      setPendingPayload(null);
+  const handleUpiSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!targetUpiId) {
+      toast.error("Please enter a valid UPI ID");
+      return;
+    }
+    const payload = {
+      amount: parseFloat(upiAmount),
+      type: "Expense",
+      category: upiCategory,
+      date: new Date().toISOString().split("T")[0],
+      payment_method: "UPI",
+      notes: upiNotes || `Paid to ${targetUpiId}`,
+      card_id: null
+    };
+
+    const encodedNotes = encodeURIComponent(upiNotes || `Paid to ${targetUpiId}`);
+    const upiUrl = `upi://pay?pa=${targetUpiId}&pn=Receiver&am=${payload.amount}&cu=INR&tn=${encodedNotes}`;
+    
+    // Attempt to open UPI app
+    window.location.href = upiUrl;
+
+    try {
+      await transactionService.create(payload);
+      toast.success("UPI Payment recorded");
+      setUpiAmount(""); setTargetUpiId(""); setUpiNotes(""); setUpiCategory("Other");
+      setUpiOpen(false);
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
@@ -153,12 +175,50 @@ export default function Transactions() {
           <h1 className="text-4xl font-bold tracking-tight">Transactions</h1>
           <p className="text-muted-foreground mt-1">Manage your income and expenses</p>
         </div>
-        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button className="rounded-xl shadow-lg shadow-primary/20">
-              <Plus className="mr-2 h-4 w-4" /> Add Transaction
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-3 items-center">
+          <Dialog open={upiOpen} onOpenChange={setUpiOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="rounded-xl border-primary/50 text-white hover:bg-primary/10 transition-colors">
+                <Smartphone className="mr-2 h-4 w-4 text-green-400" /> Pay via UPI
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="rounded-2xl glass-card border-white/10">
+              <DialogHeader><DialogTitle>Quick UPI Payment</DialogTitle></DialogHeader>
+              <form onSubmit={handleUpiSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Receiver UPI ID</Label>
+                  <Input required value={targetUpiId} onChange={(e) => setTargetUpiId(e.target.value)} placeholder="e.g. merchant@upi" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Amount (₹)</Label>
+                    <Input type="number" step="0.01" min="0.01" required value={upiAmount} onChange={(e) => setUpiAmount(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Category</Label>
+                    <Select value={upiCategory} onValueChange={setUpiCategory}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>{categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Notes (Optional)</Label>
+                  <Input value={upiNotes} onChange={(e) => setUpiNotes(e.target.value)} placeholder="What is this for?" />
+                </div>
+                <Button type="submit" className="w-full rounded-xl py-6 bg-green-500 hover:bg-green-600 text-white font-bold text-lg">
+                  Pay & Record
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
+            <DialogTrigger asChild>
+              <Button className="rounded-xl shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Plus className="mr-2 h-4 w-4" /> Add Transaction
+              </Button>
+            </DialogTrigger>
           <DialogContent className="rounded-2xl glass-card border-white/10">
             <DialogHeader><DialogTitle>{editing ? "Edit" : "Add"} Transaction</DialogTitle></DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -220,14 +280,6 @@ export default function Transactions() {
           </DialogContent>
         </Dialog>
       </div>
-
-      <PaymentSandboxModal 
-        isOpen={showSandbox} 
-        onClose={() => setShowSandbox(false)} 
-        onSuccess={handleSandboxSuccess} 
-        amount={pendingPayload?.amount || 0} 
-        title={pendingPayload?.category || "Transaction"}
-      />
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
         <div className="md:col-span-6 relative">
