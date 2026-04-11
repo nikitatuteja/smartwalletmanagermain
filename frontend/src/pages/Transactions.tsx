@@ -280,6 +280,7 @@ export default function Transactions() {
           </DialogContent>
         </Dialog>
       </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
         <div className="md:col-span-6 relative">
