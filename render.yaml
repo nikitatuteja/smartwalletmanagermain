@@ -1,0 +1,28 @@
+services:
+  # Python Flask Backend
+  - type: web
+    name: fintrack-api
+    env: python
+    region: ohio
+    plan: free
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "cd backend && gunicorn app:app"
+    envVars:
+      - key: FLASK_DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fintrack-db
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: SECRET_KEY
+        generateValue: true
+    
+databases:
+  # PostgreSQL Database Deployment
+  - name: fintrack-db
+    region: ohio
+    plan: free
+    databaseName: fintrack
+    user: fintrack_user

@@ -10,3 +10,4 @@ SQLAlchemy>=2.0.30
 razorpay==1.4.1
 gunicorn==21.2.0
 setuptools>=68.0.0
+psycopg2-binary>=2.9.9
