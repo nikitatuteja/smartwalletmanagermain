@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 cards_bp = Blueprint('cards', __name__)
 
-@cards_bp.route('/', methods=['GET'])
+@cards_bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_cards():
     current_user_id = get_jwt_identity()
@@ -15,7 +15,7 @@ def get_cards():
         "data": [c.to_dict() for c in cards]
     }), 200
 
-@cards_bp.route('/', methods=['POST'])
+@cards_bp.route('/', methods=['POST'], strict_slashes=False)
 @jwt_required()
 def add_card():
     current_user_id = get_jwt_identity()
@@ -45,3 +45,20 @@ def add_card():
         "success": True,
         "data": new_card.to_dict()
     }), 201
+
+@cards_bp.route('/<int:card_id>', methods=['DELETE'], strict_slashes=False)
+@jwt_required()
+def delete_card(card_id):
+    current_user_id = get_jwt_identity()
+    card = Card.query.filter_by(id=card_id, user_id=current_user_id).first()
+    
+    if not card:
+        return jsonify({"success": False, "error": "Card not found"}), 404
+        
+    db.session.delete(card)
+    db.session.commit()
+    
+    return jsonify({
+        "success": True,
+        "message": "Card deleted successfully"
+    }), 200
