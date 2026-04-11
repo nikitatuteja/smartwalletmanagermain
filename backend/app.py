@@ -61,7 +61,7 @@ def create_app(config_class=Config):
     @jwt.invalid_token_loader
     def invalid_token_callback(error):
         app.logger.error(f"JWT Invalid Token Error: {error}")
-        return jsonify({"success": False, "error": "Authentication token is invalid"}), 401
+        return jsonify({"success": False, "error": f"Authentication token is invalid: {str(error)}"}), 401
     
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
