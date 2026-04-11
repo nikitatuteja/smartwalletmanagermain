@@ -6,28 +6,34 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Mail, Lock, ShieldCheck } from "lucide-react";
+import { Loader2, Mail, Lock, User as UserIcon } from "lucide-react";
 
 export default function Login() {
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState(1);
+  const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
   
   const { signIn } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await authService.login({ email, password });
+      let res;
+      if (isSignUp) {
+        res = await authService.register({ email, password, display_name: displayName });
+      } else {
+        res = await authService.login({ email, password });
+      }
+
       if (res.success && res.access_token) {
         signIn(res.access_token, res.user);
-        toast.success(`Welcome back, ${res.user.display_name}!`);
+        toast.success(isSignUp ? `Account created for ${res.user.display_name}!` : `Welcome back, ${res.user.display_name}!`);
         
         // Redirect based on role
         if (res.user.role === 'admin') {
@@ -37,7 +43,7 @@ export default function Login() {
         }
       }
     } catch (err: any) {
-      toast.error(err.message || "Login failed. Please check your credentials.");
+      toast.error(err.response?.data?.error || err.message || (isSignUp ? "Registration failed. Please try again." : "Login failed. Please check your credentials."));
     } finally {
       setLoading(false);
     }
@@ -63,18 +69,42 @@ export default function Login() {
             </div>
             <CardTitle className="text-3xl font-bold tracking-tight text-white">FinTrack</CardTitle>
             <CardDescription className="text-gray-400">
-              {step === 1 ? "Secure access to your finances" : "Enter the verification code"}
+              {isSignUp ? "Create a new account" : "Secure access to your finances"}
             </CardDescription>
           </CardHeader>
           <CardContent>
               <motion.form
-                  key="login-step"
+                  key={isSignUp ? "register" : "login"}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
-                  onSubmit={handleLogin}
+                  onSubmit={handleSubmit}
                   className="space-y-4 pt-4"
                 >
+                  <AnimatePresence>
+                    {isSignUp && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2 overflow-hidden"
+                      >
+                        <Label className="text-gray-300">Display Name</Label>
+                        <div className="relative">
+                          <UserIcon className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                          <Input 
+                            type="text" 
+                            placeholder="John Doe" 
+                            required={isSignUp} 
+                            value={displayName} 
+                            onChange={(e) => setDisplayName(e.target.value)}
+                            className="pl-10 bg-[#020817] border-white/10 text-white focus:ring-purple-500/50"
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  
                   <div className="space-y-2">
                     <Label className="text-gray-300">Email Address</Label>
                     <div className="relative">
@@ -105,13 +135,22 @@ export default function Login() {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white h-11 text-lg font-semibold transition-all duration-300 shadow-lg shadow-purple-500/20" 
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white h-11 text-lg font-semibold transition-all duration-300 shadow-lg shadow-purple-500/20 mt-2" 
                     disabled={loading}
                   >
-                    {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Login"}
+                    {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : (isSignUp ? "Sign Up" : "Login")}
                   </Button>
                 </motion.form>
           </CardContent>
+          <CardFooter className="flex justify-center pb-6">
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-purple-400 hover:text-purple-300 transition-colors bg-transparent border-none cursor-pointer"
+            >
+              {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+            </button>
+          </CardFooter>
         </Card>
       </motion.div>
     </div>
