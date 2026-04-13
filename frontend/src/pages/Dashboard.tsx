@@ -26,7 +26,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const categories = ["Food", "Fuel", "Rent", "Shopping", "Salary", "Freelance", "Utilities", "Entertainment", "Travel", "Other"];
 
 export default function Dashboard() {
-  const { data, loading, refetch } = useDashboard();
+  const { data, loading, refetch } = useDashboard()!;
   const { user } = useAuth();
   
   // Quick Payment State

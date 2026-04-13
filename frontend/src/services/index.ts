@@ -7,6 +7,10 @@ export interface ApiResponse<T = any> {
   error?: string;
   access_token?: string;
   user?: any;
+  order_id?: string;
+  key_id?: string;
+  amount?: number;
+  currency?: string;
 }
 
 export const authService = {

@@ -1,10 +1,16 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { dashboardService } from '@/services/index';
 
-const DashboardContext = createContext(null);
+interface DashboardContextType {
+  data: any;
+  loading: boolean;
+  refetch: () => Promise<void>;
+}
 
-export const DashboardProvider = ({ children }) => {
-  const [data, setData] = useState(null);
+const DashboardContext = createContext<DashboardContextType | null>(null);
+
+export const DashboardProvider = ({ children }: { children: ReactNode }) => {
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchDashboard = useCallback(async () => {
