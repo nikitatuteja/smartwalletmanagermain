@@ -1,12 +1,50 @@
-# smartwalletmanagermain
-# SmartPersonalFinanceAndCreditCardManagementSystem
+# FINTRACK – Smart Personal Finance & Credit Card Management System
 
-Managing personal finances has become increasingly complex due to multiple income sources, frequent digital payments, and the use of multiple credit cards. Many individuals fail to track daily expenses properly and often miss credit card due dates, resulting in late fees and poor financial planning. Existing finance applications are either too complex or lack transparency and user control.
+## What is this Project?
+This project is a web-based personal finance assistant that helps users manage money efficiently. It helps users:
+- Track their income and expenses
+- Manage their credit/debit cards
+- Monitor credit card dues
+- Get a clear view of their financial status
 
-This project aims to build a simple, secure, and user-friendly personal finance management system that allows users to track income and expenses, manage credit cards, and monitor credit card dues in one unified platform.
-# FinTrack - Personal Finance Manager
+## Problem It Solves
+Many people:
+- Don’t track daily expenses
+- Forget credit card due dates
+- Use multiple payment methods without clarity
+- End up overspending or paying late fees
 
-FinTrack is a full-stack personal finance application that helps you track your income, expenses, cards, and dues. It is designed to work seamlessly on both desktop and mobile devices.
+This project solves these problems by providing one simple, unified system.
+
+## How the System Works (Flow)
+1. **User registers / logs in**
+2. **User enters data:**
+   - Income
+   - Expenses
+   - Card details
+3. **User adds dues:**
+   - Credit card dues (amount + due date)
+4. **System stores everything** securely in a database.
+5. **Dashboard shows:**
+   - Total income
+   - Total expenses
+   - Cards
+   - Upcoming dues
+
+## Main Features
+1. **User Authentication:** Secure login & registration. Passwords are protected.
+2. **Transaction Management:** Add income or expense, categorize (Food, Rent, Fuel, etc.), and edit or delete transactions.
+3. **Card Manager:** Add cards safely (only last 4 digits) and view all cards in one place.
+4. **Credit Card Dues:** Add due amount and due date, track upcoming dues, and mark them as paid/unpaid.
+5. **Dashboard:** Shows financial summary and helps the user understand their spending.
+
+## How It Is Built (Technical)
+- **Frontend:** HTML, CSS, JavaScript (React, Vite)
+- **Backend:** Python (Flask)
+- **Database:** SQLite (PostgreSQL for cloud)
+- **Concept Used:** Object-Oriented Programming
+
+---
 
 ## Project Structure
 

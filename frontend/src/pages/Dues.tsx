@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import api from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
-import { dueService, cardService, paymentService } from "@/services/index";
+import { dueService, cardService } from "@/services/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,56 +90,7 @@ export default function Dues() {
   const handleTogglePaid = async (due: Due) => {
     if (!due.is_paid) {
       setPendingDue(due);
-      
-      try {
-        const orderRes: any = await paymentService.createOrder({ amount: due.amount });
-        if (orderRes.success && orderRes.order_id) {
-          const options = {
-            key: orderRes.key_id,
-            amount: orderRes.amount,
-            currency: orderRes.currency,
-            name: "FinTrack",
-            description: `Payment for Due: ${cards.find(c => c.id === due.card_id)?.nickname || 'Card'}`,
-            order_id: orderRes.order_id,
-            handler: async (response: any) => {
-              try {
-                const verifyRes = await paymentService.verifyPayment({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                  due_id: due.id
-                });
-                if (verifyRes.success) {
-                  toast.success("Payment Successful!");
-                  fetchData();
-                } else {
-                  toast.error("Payment verification failed");
-                }
-              } catch (err: any) {
-                toast.error(err.message || "Payment verification failed");
-              }
-            },
-            prefill: {
-              email: user?.email,
-              contact: ""
-            },
-            theme: {
-              color: "#4f46e5"
-            }
-          };
-          
-          const rzp = new (window as any).Razorpay(options);
-          rzp.on('payment.failed', function (response: any){
-            toast.error(`Payment Failed: ${response.error.description}`);
-          });
-          rzp.open();
-        } else {
-          toast.error("Failed to initialize payment");
-        }
-      } catch (err: any) {
-        toast.error(err.message || "Could not connect to payment gateway");
-      }
-      
+      executeTogglePaid(due);
     } else {
       executeTogglePaid(due);
     }
