@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'smartwallet-secret-key-2024')
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'smartwallet-jwt-secret-2024')
-    db_url = os.environ.get('DATABASE_URL', 'sqlite:///smartwallet.db')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'fintrack-secret-key-2024')
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'fintrack-jwt-secret-2024')
+    db_url = os.environ.get('DATABASE_URL', 'sqlite:///fintrack.db')
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
     
