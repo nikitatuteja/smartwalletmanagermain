@@ -9,9 +9,7 @@ import Dashboard from "@/pages/Dashboard";
 import Transactions from "@/pages/Transactions";
 import CardsPage from "@/pages/Cards";
 import DuesPage from "@/pages/Dues";
-import BudgetsPage from "@/pages/Budgets";
-import GoalsPage from "@/pages/Goals";
-import Analytics from "@/pages/Analytics";
+import DuesPage from "@/pages/Dues";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -46,12 +44,11 @@ const App = () => (
             <Route element={<ProtectedRoute />}>
               <Route element={<AppLayout />}>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/analytics" element={<Analytics />} />
+
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/cards" element={<CardsPage />} />
                 <Route path="/dues" element={<DuesPage />} />
-                <Route path="/budgets" element={<BudgetsPage />} />
-                <Route path="/goals" element={<GoalsPage />} />
+
                 
                 <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                   <Route path="/admin" element={<AdminDashboard />} />

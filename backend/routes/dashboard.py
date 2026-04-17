@@ -7,7 +7,7 @@ import calendar
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
-@dashboard_bp.route('/', methods=['GET'])
+@dashboard_bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_dashboard():
     current_user_id = get_jwt_identity()

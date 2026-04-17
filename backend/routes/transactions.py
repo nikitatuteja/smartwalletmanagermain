@@ -8,7 +8,7 @@ transactions_bp = Blueprint('transactions', __name__)
 
 ALLOWED_CATEGORIES = ["Food", "Fuel", "Rent", "Shopping", "Salary", "Freelance", "Utilities", "Entertainment", "Travel", "Other"]
 
-@transactions_bp.route('/', methods=['GET'])
+@transactions_bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_transactions():
     current_user_id = get_jwt_identity()
@@ -29,7 +29,7 @@ def get_transactions():
         "data": [t.to_dict() for t in transactions]
     }), 200
 
-@transactions_bp.route('/', methods=['POST'])
+@transactions_bp.route('/', methods=['POST'], strict_slashes=False)
 @jwt_required()
 def add_transaction():
     current_user_id = get_jwt_identity()

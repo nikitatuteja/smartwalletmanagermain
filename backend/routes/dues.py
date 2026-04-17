@@ -6,7 +6,7 @@ from datetime import datetime
 
 dues_bp = Blueprint('dues', __name__)
 
-@dues_bp.route('/', methods=['GET'])
+@dues_bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_dues():
     current_user_id = get_jwt_identity()
@@ -16,7 +16,7 @@ def get_dues():
         "data": [d.to_dict() for d in dues]
     }), 200
 
-@dues_bp.route('/', methods=['POST'])
+@dues_bp.route('/', methods=['POST'], strict_slashes=False)
 @jwt_required()
 def add_due():
     current_user_id = get_jwt_identity()

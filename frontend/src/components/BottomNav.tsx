@@ -1,9 +1,8 @@
-import { LayoutDashboard, ArrowLeftRight, CreditCard, CalendarClock, PieChart, Target, BarChart3 } from "lucide-react";
+import { LayoutDashboard, ArrowLeftRight, CreditCard, CalendarClock } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Transactions", url: "/transactions", icon: ArrowLeftRight },
   { title: "Cards", url: "/cards", icon: CreditCard },
   { title: "Dues", url: "/dues", icon: CalendarClock },
