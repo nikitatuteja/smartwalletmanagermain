@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const categories = ["Food", "Fuel", "Rent", "Shopping", "Salary", "Freelance", "Utilities", "Entertainment", "Travel", "Other"];
 
@@ -167,6 +168,8 @@ export default function Transactions() {
       return matchesType && matchesCategory && matchesSearch;
     });
   }, [transactions, filterType, filterCategory, searchQuery]);
+
+  if (loading) return <div className="space-y-8"><Skeleton className="h-12 w-48" /><Skeleton className="h-[400px] rounded-2xl" /></div>;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 pb-10">
@@ -327,7 +330,7 @@ export default function Transactions() {
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-20 text-muted-foreground">No transactions found</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="text-center py-20 text-muted-foreground"><div className="flex flex-col items-center justify-center space-y-3"><Banknote size={48} className="opacity-10" /><p className="text-lg">No transactions found</p><p className="text-sm">Add a new record to get started</p></div></TableCell></TableRow>
               ) : filtered.map((t) => (
                 <TableRow key={t.id} className="group hover:bg-accent/30 border-white/5">
                   <TableCell className="py-4 text-xs md:text-sm">{formatDate(t.date)}</TableCell>

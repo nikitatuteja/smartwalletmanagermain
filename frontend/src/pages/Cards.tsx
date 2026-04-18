@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Trash2, CreditCard } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Cards() {
   const [cards, setCards] = useState<any[]>([]);
@@ -58,6 +59,8 @@ export default function Cards() {
       toast.error(err.message);
     }
   };
+
+  if (loading) return <div className="space-y-8"><Skeleton className="h-12 w-48" /><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{[1,2,3].map(i => <Skeleton key={i} className="h-48 rounded-2xl" />)}</div></div>;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 pb-20">
@@ -127,6 +130,13 @@ export default function Cards() {
             </motion.div>
           ))}
         </AnimatePresence>
+        {cards.length === 0 && !loading && (
+          <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground bg-white/5 border border-dashed border-white/10 rounded-3xl">
+            <CreditCard size={48} className="opacity-10 mb-4" />
+            <p className="text-lg">No cards securely stored yet.</p>
+            <p className="text-sm">Click "Add Card" to track your spending smartly.</p>
+          </div>
+        )}
       </div>
     </motion.div>
   );
