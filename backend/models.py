@@ -41,6 +41,19 @@ class Card(db.Model):
     nickname = db.Column(db.String(100), nullable=False)
     last_four = db.Column(db.String(4), nullable=False)
     card_type = db.Column(db.String(10), nullable=False) # Credit or Debit
+    
+    # New fields
+    bank_name = db.Column(db.String(100), nullable=True)
+    network = db.Column(db.String(50), nullable=True) # Visa / Mastercard / RuPay / Amex
+    card_name = db.Column(db.String(100), nullable=True)
+    expiry_month = db.Column(db.String(2), nullable=True)
+    expiry_year = db.Column(db.String(4), nullable=True)
+    billing_date = db.Column(db.Integer, nullable=True)
+    credit_limit = db.Column(db.Float, nullable=True)
+    available_limit = db.Column(db.Float, nullable=True)
+    status = db.Column(db.String(20), default='Active')
+    color_theme = db.Column(db.String(20), default='Blue')
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -54,6 +67,16 @@ class Card(db.Model):
             "nickname": self.nickname,
             "last_four": self.last_four,
             "card_type": self.card_type,
+            "bank_name": self.bank_name,
+            "network": self.network,
+            "card_name": self.card_name,
+            "expiry_month": self.expiry_month,
+            "expiry_year": self.expiry_year,
+            "billing_date": self.billing_date,
+            "credit_limit": self.credit_limit,
+            "available_limit": self.available_limit,
+            "status": self.status,
+            "color_theme": self.color_theme,
             "created_at": self.created_at.isoformat()
         }
 

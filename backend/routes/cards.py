@@ -26,6 +26,18 @@ def add_card():
     nickname = data.get('nickname')
     last_four = data.get('last_four')
     card_type = data.get('card_type')
+    
+    # New fields
+    bank_name = data.get('bank_name')
+    network = data.get('network')
+    card_name = data.get('card_name')
+    expiry_month = data.get('expiry_month')
+    expiry_year = data.get('expiry_year')
+    billing_date = data.get('billing_date')
+    credit_limit = data.get('credit_limit')
+    available_limit = data.get('available_limit')
+    status = data.get('status', 'Active')
+    color_theme = data.get('color_theme', 'Blue')
 
     if not nickname or not last_four or not card_type:
         return jsonify({"success": False, "error": "Missing required fields"}), 400
@@ -37,7 +49,17 @@ def add_card():
         user_id=current_user_id,
         nickname=nickname,
         last_four=last_four,
-        card_type=card_type
+        card_type=card_type,
+        bank_name=bank_name,
+        network=network,
+        card_name=card_name,
+        expiry_month=expiry_month,
+        expiry_year=expiry_year,
+        billing_date=int(billing_date) if billing_date else None,
+        credit_limit=float(credit_limit) if credit_limit else None,
+        available_limit=float(available_limit) if available_limit else None,
+        status=status,
+        color_theme=color_theme
     )
     db.session.add(new_card)
     db.session.commit()
