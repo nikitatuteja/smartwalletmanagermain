@@ -17,8 +17,8 @@ export default function BottomNav() {
           key={item.title}
           to={item.url}
           end={item.url === "/"}
-          className="flex flex-col items-center gap-1 text-muted-foreground transition-colors"
-          activeClassName="text-primary font-medium"
+          className="flex flex-col items-center gap-1 text-muted-foreground transition-all hover:-translate-y-1 p-2 rounded-xl"
+          activeClassName="text-[#5B5BD6] dark:text-[#7C7CFF] drop-shadow-md font-semibold bg-[#5B5BD6]/10"
         >
           <item.icon className="h-5 w-5" />
           <span className="text-[10px]">{item.title}</span>

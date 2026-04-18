@@ -124,7 +124,7 @@ export default function Dues() {
           </DialogTrigger>
           <DialogContent className="glass-card border-white/10 rounded-2xl">
             <DialogHeader><DialogTitle>Add New Due Payment</DialogTitle></DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label>Select Card</Label>
                 <Select value={cardId} onValueChange={setCardId}>
@@ -156,7 +156,7 @@ export default function Dues() {
         <AnimatePresence>
           {dues.map((due) => (
             <motion.div key={due.id} layout initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}>
-              <Card className={`glass-card border-white/10 overflow-hidden relative group ${due.is_paid ? 'opacity-60 grayscale-[0.5]' : ''}`}>
+              <Card className={`glass-card border-white/10 overflow-hidden relative group hover:-translate-y-1 hover:shadow-2xl ${due.is_paid ? 'opacity-60 grayscale-[0.5]' : 'bg-gradient-to-br from-[#5B5BD6]/5 to-transparent'}`}>
                 {due.is_overdue && !due.is_paid && (
                   <div className="absolute top-0 right-0 p-2">
                     <Badge variant="destructive" className="animate-pulse rounded-lg">OVERDUE</Badge>

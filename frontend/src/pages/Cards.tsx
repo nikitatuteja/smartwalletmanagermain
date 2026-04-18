@@ -74,7 +74,7 @@ export default function Cards() {
           </DialogTrigger>
           <DialogContent className="glass-card border-white/10 rounded-2xl">
             <DialogHeader><DialogTitle>Add New Card</DialogTitle></DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label>Card Nickname</Label>
                 <Input placeholder="e.g. HDFC Millennia" required value={nickname} onChange={(e) => setNickname(e.target.value)} />
@@ -105,7 +105,7 @@ export default function Cards() {
         <AnimatePresence>
           {cards.map((card) => (
             <motion.div key={card.id} layout initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}>
-              <Card className="glass-card border-white/10 overflow-hidden group h-48 flex flex-col justify-between p-6">
+              <Card className="glass-card border-white/10 overflow-hidden group h-48 flex flex-col justify-between p-6 hover:-translate-y-1 hover:shadow-2xl bg-gradient-to-br from-[#5B5BD6]/5 to-transparent">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <p className="text-[10px] font-medium text-white/50 uppercase tracking-widest">{card.card_type}</p>

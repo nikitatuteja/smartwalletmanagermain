@@ -85,21 +85,24 @@ export default function Dashboard() {
       value: formatCurrency(data?.total_income || 0), 
       icon: TrendingUp, 
       color: "text-green-500",
-      bg: "bg-green-500/10"
+      bg: "bg-green-500/10",
+      cardBg: "bg-gradient-to-br from-green-500/5 to-transparent"
     },
     { 
       title: "Total Expense", 
       value: formatCurrency(data?.total_expense || 0), 
       icon: TrendingDown, 
       color: "text-red-500",
-      bg: "bg-red-500/10"
+      bg: "bg-red-500/10",
+      cardBg: "bg-gradient-to-br from-red-500/5 to-transparent"
     },
     { 
       title: "Net Balance", 
       value: formatCurrency(data?.net_balance || 0), 
       icon: Wallet, 
-      color: "text-indigo-500",
-      bg: "bg-indigo-500/10"
+      color: "text-[#5B5BD6]",
+      bg: "bg-[#5B5BD6]/10",
+      cardBg: "bg-gradient-to-br from-[#5B5BD6]/10 to-transparent"
     }
   ];
 
@@ -176,7 +179,7 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((stat, i) => (
-            <Card key={i} className="glass-card border-white/10 overflow-hidden group">
+            <Card key={i} className={`glass-card border-white/10 overflow-hidden group hover:-translate-y-1 hover:shadow-2xl ${stat.cardBg}`}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -193,7 +196,7 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="glass-card border-white/10">
+          <Card className="glass-card border-white/10 hover:-translate-y-1 hover:shadow-2xl">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5 text-indigo-500" />
@@ -239,7 +242,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card border-white/10">
+          <Card className="glass-card border-white/10 hover:-translate-y-1 hover:shadow-2xl">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-indigo-500" />

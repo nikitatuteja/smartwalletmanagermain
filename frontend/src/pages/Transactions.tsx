@@ -184,7 +184,7 @@ export default function Transactions() {
             </DialogTrigger>
             <DialogContent className="rounded-2xl glass-card border-white/10">
               <DialogHeader><DialogTitle>Quick UPI Payment</DialogTitle></DialogHeader>
-              <form onSubmit={handleUpiSubmit} className="space-y-4">
+              <form onSubmit={handleUpiSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label>Receiver UPI ID</Label>
                   <Input required value={targetUpiId} onChange={(e) => setTargetUpiId(e.target.value)} placeholder="e.g. merchant@upi" />
@@ -221,7 +221,7 @@ export default function Transactions() {
             </DialogTrigger>
           <DialogContent className="rounded-2xl glass-card border-white/10">
             <DialogHeader><DialogTitle>{editing ? "Edit" : "Add"} Transaction</DialogTitle></DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Amount (₹)</Label>
@@ -313,7 +313,7 @@ export default function Transactions() {
         </div>
       </div>
 
-      <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
+      <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden bg-card/60 backdrop-blur-2xl rounded-2xl">
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-accent/50">

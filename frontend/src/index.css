@@ -10,7 +10,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 263.4 70% 50.4%;
+    --primary: 240 60% 60%;
     --primary-foreground: 210 40% 98%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -41,7 +41,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262.1 83.3% 57.8%;
+    --primary: 240 60% 60%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -75,9 +75,9 @@
 }
 
 .glass-card {
-  @apply bg-card/40 backdrop-blur-xl border border-white/10 shadow-2xl;
+  @apply bg-card/60 backdrop-blur-2xl border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-2xl rounded-2xl transition-all duration-300;
 }
 
 .glass-panel {
-  @apply bg-background/60 backdrop-blur-md border border-white/5;
+  @apply bg-background/80 backdrop-blur-xl border border-white/10 rounded-t-2xl shadow-[0_-4px_24px_rgb(0,0,0,0.1)];
 }

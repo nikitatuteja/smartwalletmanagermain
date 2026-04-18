@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 
-const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#06b6d4'];
+const COLORS = ['#5B5BD6', '#7C7CFF', '#9E9EFF', '#C1C1FF', '#eb4899', '#f43f5e', '#22c55e', '#eab308'];
 
 export default function Analytics() {
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ export default function Analytics() {
       {data?.summary && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="glass-card border-white/10 overflow-hidden group">
+            <Card className="glass-card border-white/10 overflow-hidden group hover:-translate-y-1 hover:shadow-2xl bg-gradient-to-br from-green-500/5 to-transparent">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -53,7 +53,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-white/10 overflow-hidden group">
+            <Card className="glass-card border-white/10 overflow-hidden group hover:-translate-y-1 hover:shadow-2xl bg-gradient-to-br from-red-500/5 to-transparent">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -64,28 +64,28 @@ export default function Analytics() {
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-white/10 overflow-hidden group">
+            <Card className="glass-card border-white/10 overflow-hidden group hover:-translate-y-1 hover:shadow-2xl bg-gradient-to-br from-[#5B5BD6]/10 to-transparent">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Net Balance</p>
-                    <h3 className="text-2xl font-bold mt-1 tracking-tight text-indigo-500">₹{data.summary.net_balance.toLocaleString()}</h3>
+                    <h3 className="text-2xl font-bold mt-1 tracking-tight text-[#5B5BD6]">₹{data.summary.net_balance.toLocaleString()}</h3>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 text-center">
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-[#5B5BD6]/10 to-[#7C7CFF]/10 border border-[#5B5BD6]/20 text-center hover:-translate-y-1 shadow-lg transition-all">
             <p className="text-lg font-medium">
-              You spent the most on <span className="text-indigo-400 font-bold text-xl">{data.summary.top_category}</span> this month.
+              You spent the most on <span className="text-[#5B5BD6] font-bold text-xl">{data.summary.top_category}</span> this month.
             </p>
           </div>
         </>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="glass-card border-white/10">
+        <Card className="glass-card border-white/10 hover:-translate-y-1 hover:shadow-2xl">
           <CardHeader><CardTitle>Category Breakdown</CardTitle></CardHeader>
           <CardContent className="h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -100,7 +100,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-white/10">
+        <Card className="glass-card border-white/10 hover:-translate-y-1 hover:shadow-2xl">
           <CardHeader><CardTitle>Monthly Expense Trend</CardTitle></CardHeader>
           <CardContent className="h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -109,13 +109,13 @@ export default function Analytics() {
                 <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} />
                 <YAxis stroke="#94a3b8" fontSize={12} />
                 <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }} />
-                <Line type="monotone" dataKey="expenses" stroke="#6366f1" strokeWidth={2} />
+                <Line type="monotone" dataKey="expenses" stroke="#5B5BD6" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-white/10 lg:col-span-2">
+        <Card className="glass-card border-white/10 lg:col-span-2 hover:-translate-y-1 hover:shadow-2xl">
           <CardHeader><CardTitle>Income vs Expenses</CardTitle></CardHeader>
           <CardContent className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
