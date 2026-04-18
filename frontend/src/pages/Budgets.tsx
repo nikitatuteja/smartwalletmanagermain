@@ -21,7 +21,7 @@ interface Budget {
   month: string;
 }
 
-const categories = ["Food", "Fuel", "Rent", "Shopping", "Salary", "Freelance", "Utilities", "Entertainment", "Travel", "Other"];
+const expenseCategories = ["Food", "Fuel", "Rent", "Shopping", "Utilities", "Entertainment", "Travel", "Healthcare", "Education", "Subscription", "EMI / Loan", "Other Expense"];
 
 export default function Budgets() {
   const { user } = useAuth();
@@ -103,7 +103,7 @@ export default function Budgets() {
                   <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger className="rounded-xl border-white/10"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {expenseCategories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>

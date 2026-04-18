@@ -23,7 +23,7 @@ import { useDashboard } from "@/contexts/DashboardContext";
 import { dashboardService, transactionService } from "@/services/index";
 import { useAuth } from "@/contexts/AuthContext";
 
-const categories = ["Food", "Fuel", "Rent", "Shopping", "Salary", "Freelance", "Utilities", "Entertainment", "Travel", "Other"];
+const expenseCategories = ["Food", "Fuel", "Rent", "Shopping", "Utilities", "Entertainment", "Travel", "Healthcare", "Education", "Subscription", "EMI / Loan", "Other Expense"];
 
 export default function Dashboard() {
   const { data, loading, refetch } = useDashboard()!;
@@ -149,7 +149,7 @@ export default function Dashboard() {
                         <SelectValue placeholder="Select Category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map(c => (
+                        {expenseCategories.map(c => (
                           <SelectItem key={c} value={c}>{c}</SelectItem>
                         ))}
                       </SelectContent>

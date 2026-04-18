@@ -26,7 +26,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const categories = ["Food", "Fuel", "Rent", "Shopping", "Salary", "Freelance", "Utilities", "Entertainment", "Travel", "Other"];
+const incomeCategories = ["Salary", "Freelance", "Bonus", "Investment Return", "Business Income", "Cashback", "Refund", "Gift Received", "Other Income"];
+const expenseCategories = ["Food", "Fuel", "Rent", "Shopping", "Utilities", "Entertainment", "Travel", "Healthcare", "Education", "Subscription", "EMI / Loan", "Other Expense"];
+const allCategories = [...expenseCategories, ...incomeCategories];
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -40,7 +42,7 @@ export default function Transactions() {
   const [upiAmount, setUpiAmount] = useState("");
   const [targetUpiId, setTargetUpiId] = useState("");
   const [upiNotes, setUpiNotes] = useState("");
-  const [upiCategory, setUpiCategory] = useState("Other");
+  const [upiCategory, setUpiCategory] = useState("Other Expense");
 
   // Filters
   const [filterType, setFilterType] = useState("All");
@@ -50,7 +52,7 @@ export default function Transactions() {
   // Form state
   const [amount, setAmount] = useState("");
   const [type, setType] = useState<"Income" | "Expense">("Expense");
-  const [category, setCategory] = useState("Food");
+  const [category, setCategory] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [paymentMethod, setPaymentMethod] = useState<"Cash" | "UPI" | "Card">("Cash");
   const [notes, setNotes] = useState("");
@@ -74,7 +76,7 @@ export default function Transactions() {
   useEffect(() => { fetchData(); }, []);
 
   const resetForm = () => {
-    setAmount(""); setType("Expense"); setCategory("Food");
+    setAmount(""); setType("Expense"); setCategory("");
     setDate(new Date().toISOString().split("T")[0]); setPaymentMethod("Cash"); setNotes(""); 
     setCardId(""); setEditing(null);
   };
@@ -134,7 +136,7 @@ export default function Transactions() {
     try {
       await transactionService.create(payload);
       toast.success("UPI Payment recorded");
-      setUpiAmount(""); setTargetUpiId(""); setUpiNotes(""); setUpiCategory("Other");
+      setUpiAmount(""); setTargetUpiId(""); setUpiNotes(""); setUpiCategory("Other Expense");
       setUpiOpen(false);
       fetchData();
     } catch (err: any) {
@@ -200,8 +202,8 @@ export default function Transactions() {
                   <div className="space-y-2">
                     <Label>Category</Label>
                     <Select value={upiCategory} onValueChange={setUpiCategory}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>{categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                      <SelectTrigger><SelectValue placeholder="Select Category" /></SelectTrigger>
+                      <SelectContent>{expenseCategories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                 </div>
@@ -232,7 +234,7 @@ export default function Transactions() {
                 </div>
                 <div className="space-y-2">
                   <Label>Type</Label>
-                  <Select value={type} onValueChange={(v: any) => setType(v)}>
+                  <Select value={type} onValueChange={(v: any) => { setType(v); setCategory(""); }}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Income">Income</SelectItem>
@@ -245,8 +247,8 @@ export default function Transactions() {
                 <div className="space-y-2">
                   <Label>Category</Label>
                   <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                    <SelectTrigger><SelectValue placeholder="Select Category" /></SelectTrigger>
+                    <SelectContent>{(type === "Income" ? incomeCategories : expenseCategories).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
@@ -310,7 +312,7 @@ export default function Transactions() {
             <SelectTrigger className="bg-card/50"><SelectValue placeholder="Category" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All Categories</SelectItem>
-              {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              {allCategories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
