@@ -9,7 +9,6 @@ import Dashboard from "@/pages/Dashboard";
 import Transactions from "@/pages/Transactions";
 import CardsPage from "@/pages/Cards";
 import DuesPage from "@/pages/Dues";
-import DuesPage from "@/pages/Dues";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
