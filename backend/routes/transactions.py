@@ -6,7 +6,8 @@ from datetime import datetime
 
 transactions_bp = Blueprint('transactions', __name__)
 
-ALLOWED_CATEGORIES = ["Food", "Fuel", "Rent", "Shopping", "Salary", "Freelance", "Utilities", "Entertainment", "Travel", "Other"]
+INCOME_CATEGORIES = ["Salary", "Freelance", "Bonus", "Investment Return", "Business Income", "Cashback", "Refund", "Gift Received", "Other Income"]
+EXPENSE_CATEGORIES = ["Food", "Fuel", "Rent", "Shopping", "Utilities", "Entertainment", "Travel", "Healthcare", "Education", "Subscription", "EMI / Loan", "Other Expense"]
 
 @transactions_bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
@@ -49,7 +50,9 @@ def add_transaction():
         return jsonify({"success": False, "error": "Valid positive amount is required"}), 400
     if t_type not in ["Income", "Expense"]:
         return jsonify({"success": False, "error": "Type must be 'Income' or 'Expense'"}), 400
-    if category not in ALLOWED_CATEGORIES:
+    if t_type == "Income" and category not in INCOME_CATEGORIES:
+        return jsonify({"success": False, "error": "Invalid category"}), 400
+    if t_type == "Expense" and category not in EXPENSE_CATEGORIES:
         return jsonify({"success": False, "error": "Invalid category"}), 400
     if not date_str:
         return jsonify({"success": False, "error": "Date is required"}), 400
