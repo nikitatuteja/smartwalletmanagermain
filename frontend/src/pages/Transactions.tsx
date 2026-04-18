@@ -181,8 +181,8 @@ export default function Transactions() {
         <div className="flex gap-3 items-center">
           <Dialog open={upiOpen} onOpenChange={setUpiOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="rounded-xl border-primary/50 text-white hover:bg-primary/10 transition-colors">
-                <Smartphone className="mr-2 h-4 w-4 text-green-400" /> Pay via UPI
+              <Button variant="outline" className="rounded-xl border-primary/50 text-slate-900 dark:text-white hover:bg-primary/10 transition-colors shadow-sm">
+                <Smartphone className="mr-2 h-4 w-4 text-[#5B5BD6] dark:text-[#7C7CFF]" /> Pay via UPI
               </Button>
             </DialogTrigger>
             <DialogContent className="rounded-2xl glass-card border-white/10">
@@ -347,7 +347,14 @@ export default function Transactions() {
                   <TableCell className="py-4">
                     <span className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-medium">{t.category}</span>
                   </TableCell>
-                  <TableCell className="py-4 text-muted-foreground text-xs md:text-sm">{t.payment_method}</TableCell>
+                  <TableCell className="py-4">
+                    <span className="px-2.5 py-1 flex items-center gap-1.5 rounded-lg font-medium w-fit bg-slate-100 text-slate-800 dark:bg-white/10 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm text-xs md:text-sm transition-colors">
+                      {t.payment_method === 'UPI' && <Smartphone size={14} className="text-[#5B5BD6] dark:text-[#7C7CFF]" />}
+                      {t.payment_method === 'Card' && <CreditCard size={14} className="text-purple-600 dark:text-purple-400" />}
+                      {t.payment_method === 'Cash' && <Banknote size={14} className="text-green-600 dark:text-green-400" />}
+                      {t.payment_method}
+                    </span>
+                  </TableCell>
                   <TableCell className={`py-4 text-right font-bold ${t.type === 'Income' ? 'text-green-500' : 'text-red-500'}`}>
                     {t.type === 'Income' ? '+' : '-'} {formatCurrency(t.amount)}
                   </TableCell>
