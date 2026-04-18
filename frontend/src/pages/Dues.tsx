@@ -192,11 +192,13 @@ export default function Dues() {
             </motion.div>
           ))}
         </AnimatePresence>
-        {dues.length === 0 && (
+        {dues.length === 0 && !loading && (
           <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground bg-white/5 border border-dashed border-white/10 rounded-3xl">
             <AlertCircle size={48} className="opacity-10 mb-4" />
-            <p className="text-lg">No pending dues to track</p>
-            <p className="text-sm">Enjoy your debt-free life!</p>
+            <p className="text-lg font-semibold text-white">No data yet. Start by adding your first entry.</p>
+            <Button className="mt-6 rounded-xl bg-gradient-to-r from-[#5B5BD6] to-[#7C7CFF] text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all text-base px-6 py-6" onClick={() => setOpen(true)}>
+              <Plus className="h-5 w-5 mr-2" /> Add 
+            </Button>
           </div>
         )}
       </div>

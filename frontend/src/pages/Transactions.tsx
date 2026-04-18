@@ -330,7 +330,17 @@ export default function Transactions() {
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-20 text-muted-foreground"><div className="flex flex-col items-center justify-center space-y-3"><Banknote size={48} className="opacity-10" /><p className="text-lg">No transactions found</p><p className="text-sm">Add a new record to get started</p></div></TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-20 text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center space-y-4">
+                      <Banknote size={48} className="opacity-10" />
+                      <p className="text-lg font-semibold text-white">No data yet. Start by adding your first entry.</p>
+                      <Button className="rounded-xl px-6 py-6 bg-gradient-to-r from-[#5B5BD6] to-[#7C7CFF] text-white text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all" onClick={() => setOpen(true)}>
+                        <Plus className="h-5 w-5 mr-2" /> Add 
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
               ) : filtered.map((t) => (
                 <TableRow key={t.id} className="group hover:bg-accent/30 border-white/5">
                   <TableCell className="py-4 text-xs md:text-sm">{formatDate(t.date)}</TableCell>

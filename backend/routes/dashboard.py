@@ -45,6 +45,17 @@ def get_dashboard():
         Due.due_date < today
     ).count()
 
+    # Calculate transaction count
+    transaction_count = len(transactions)
+    
+    # Calculate top expense category
+    expense_category_totals = {}
+    for t in transactions:
+        if t.type == 'Expense':
+            expense_category_totals[t.category] = expense_category_totals.get(t.category, 0) + float(t.amount)
+            
+    top_category = max(expense_category_totals, key=expense_category_totals.get) if expense_category_totals else None
+
     return jsonify({
         "success": True,
         "data": {
@@ -54,6 +65,8 @@ def get_dashboard():
             "total_cards": total_cards,
             "upcoming_dues": upcoming_dues,
             "overdue_dues": overdue_dues,
-            "current_month": today.strftime("%B %Y")
+            "current_month": today.strftime("%B %Y"),
+            "transaction_count": transaction_count,
+            "top_category": top_category
         }
     }), 200

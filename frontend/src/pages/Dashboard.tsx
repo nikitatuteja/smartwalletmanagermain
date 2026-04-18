@@ -251,9 +251,29 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <p className="text-sm text-muted-foreground italic">
-                  "Your net balance for this month is {data?.net_balance >= 0 ? 'positive' : 'negative'}."
-                </p>
+                <div className="space-y-3">
+                  {data?.transaction_count === 0 ? (
+                    <p className="text-sm text-muted-foreground font-medium">Start adding transactions to see insights.</p>
+                  ) : (
+                    <>
+                      <p className="text-base">
+                        You made <span className="text-[#5B5BD6] font-bold text-lg">{data?.transaction_count}</span> transactions this month.
+                      </p>
+                      {data?.top_category && (
+                        <p className="text-base">
+                          You spent most on <span className="text-red-400 font-bold text-lg">{data?.top_category}</span> this month.
+                        </p>
+                      )}
+                      <p className="text-base text-muted-foreground">
+                        {data?.net_balance >= 0 ? (
+                          <>You saved <span className="text-green-500 font-bold text-lg">₹{data?.net_balance.toLocaleString()}</span> this month.</>
+                        ) : (
+                          <>Your expenses exceeded your income by <span className="text-red-500 font-bold text-lg">₹{Math.abs(data?.net_balance).toLocaleString()}</span>.</>
+                        )}
+                      </p>
+                    </>
+                  )}
+                </div>
                 <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/10">
                   <h4 className="font-semibold text-indigo-400 mb-2">Tip</h4>
                   <p className="text-sm text-muted-foreground">Track your expenses daily to stay on top of your financial goals.</p>

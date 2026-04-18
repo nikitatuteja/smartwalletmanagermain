@@ -3,6 +3,7 @@ import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +27,7 @@ const navItems = [
 
 export function AppSidebar() {
   const { signOut } = useAuth();
+  const [openLogout, setOpenLogout] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>(
     (localStorage.getItem('theme') as 'dark' | 'light') || 'dark'
   );
@@ -79,10 +81,23 @@ export function AppSidebar() {
           {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
         </Button>
-        <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10" onClick={signOut}>
-          <LogOut className="h-4 w-4" />
-          <span>Sign Out</span>
-        </Button>
+        <Dialog open={openLogout} onOpenChange={setOpenLogout}>
+          <DialogTrigger asChild>
+            <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10">
+              <LogOut className="h-4 w-4" />
+              <span>Sign Out</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px] glass-card border-white/10 rounded-2xl p-6 shadow-2xl backdrop-blur-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl">Are you sure you want to logout?</DialogTitle>
+            </DialogHeader>
+            <div className="flex gap-4 justify-end mt-4">
+              <Button variant="outline" onClick={() => setOpenLogout(false)} className="rounded-xl border-white/10">Cancel</Button>
+              <Button onClick={() => { setOpenLogout(false); signOut(); }} className="rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all">Logout</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </SidebarFooter>
     </Sidebar>
   );
