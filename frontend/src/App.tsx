@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
+import Analytics from "./pages/Analytics";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -47,6 +48,7 @@ const App = () => (
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/cards" element={<CardsPage />} />
                 <Route path="/dues" element={<DuesPage />} />
+                <Route path="/analytics" element={<Analytics />} />
 
                 
                 <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

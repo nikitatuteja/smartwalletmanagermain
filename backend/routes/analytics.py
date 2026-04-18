@@ -54,9 +54,31 @@ def get_analytics():
     line_chart = [{"month": m, "expenses": line_data_map.get(m, 0.0)} for m in sorted_months]
     bar_chart = [bar_data_map[m] for m in sorted_months]
 
+    # Calculate current month totals
+    current_month_income = 0.0
+    current_month_expense = 0.0
+    for t in transactions:
+        if t.date >= start_of_month:
+            if t.type == 'Income':
+                current_month_income += float(t.amount)
+            else:
+                current_month_expense += float(t.amount)
+                
+    net_balance = current_month_income - current_month_expense
+    
+    top_category = "None"
+    if pie_data_map:
+        top_category = max(pie_data_map, key=pie_data_map.get)
+
     return jsonify({
         "success": True,
         "data": {
+            "summary": {
+                "current_month_income": current_month_income,
+                "current_month_expense": current_month_expense,
+                "net_balance": net_balance,
+                "top_category": top_category
+            },
             "pie_chart": pie_chart,
             "line_chart": line_chart,
             "bar_chart": bar_chart

@@ -39,6 +39,51 @@ export default function Analytics() {
         <p className="text-muted-foreground mt-1">Insights into your spending habits</p>
       </div>
 
+      {data?.summary && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="glass-card border-white/10 overflow-hidden group">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Monthly Income</p>
+                    <h3 className="text-2xl font-bold mt-1 tracking-tight text-green-500">₹{data.summary.current_month_income.toLocaleString()}</h3>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-card border-white/10 overflow-hidden group">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Monthly Expense</p>
+                    <h3 className="text-2xl font-bold mt-1 tracking-tight text-red-500">₹{data.summary.current_month_expense.toLocaleString()}</h3>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-card border-white/10 overflow-hidden group">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Net Balance</p>
+                    <h3 className="text-2xl font-bold mt-1 tracking-tight text-indigo-500">₹{data.summary.net_balance.toLocaleString()}</h3>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 text-center">
+            <p className="text-lg font-medium">
+              You spent the most on <span className="text-indigo-400 font-bold text-xl">{data.summary.top_category}</span> this month.
+            </p>
+          </div>
+        </>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className="glass-card border-white/10">
           <CardHeader><CardTitle>Category Breakdown</CardTitle></CardHeader>
