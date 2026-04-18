@@ -31,6 +31,7 @@ def add_card():
     bank_name = data.get('bank_name')
     network = data.get('network')
     card_name = data.get('card_name')
+    card_holder = data.get('card_holder')
     expiry_month = data.get('expiry_month')
     expiry_year = data.get('expiry_year')
     billing_date = data.get('billing_date')
@@ -53,6 +54,7 @@ def add_card():
         bank_name=bank_name,
         network=network,
         card_name=card_name,
+        card_holder=card_holder,
         expiry_month=expiry_month,
         expiry_year=expiry_year,
         billing_date=int(billing_date) if billing_date else None,

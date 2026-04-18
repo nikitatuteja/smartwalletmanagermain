@@ -46,6 +46,7 @@ class Card(db.Model):
     bank_name = db.Column(db.String(100), nullable=True)
     network = db.Column(db.String(50), nullable=True) # Visa / Mastercard / RuPay / Amex
     card_name = db.Column(db.String(100), nullable=True)
+    card_holder = db.Column(db.String(100), nullable=True)
     expiry_month = db.Column(db.String(2), nullable=True)
     expiry_year = db.Column(db.String(4), nullable=True)
     billing_date = db.Column(db.Integer, nullable=True)
@@ -70,6 +71,7 @@ class Card(db.Model):
             "bank_name": self.bank_name,
             "network": self.network,
             "card_name": self.card_name,
+            "card_holder": self.card_holder,
             "expiry_month": self.expiry_month,
             "expiry_year": self.expiry_year,
             "billing_date": self.billing_date,

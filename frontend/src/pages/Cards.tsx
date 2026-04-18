@@ -35,11 +35,16 @@ const CardVisual = ({ card, isPreview = false, onDelete }: { card: any, isPrevie
       {/* Top Row: Bank name + Network */}
       <div className="relative flex items-start justify-between z-10">
         <div className="flex flex-col">
-          <h3 className={`text-xl font-bold tracking-tight transition-colors duration-300 ${primaryTextClass} truncate max-w-[150px]`}>
-            {card.bank_name || (!isPreview && card.nickname ? card.nickname : (isPreview ? "Bank Name" : ""))}
+          <h3 className={`text-[1.1rem] font-bold tracking-tight transition-colors duration-300 ${primaryTextClass} truncate max-w-[180px]`}>
+            {card.bank_name || (isPreview ? "Bank Name" : "")}
           </h3>
-          {(card.bank_name || isPreview) && (
-            <p className={`text-sm ${secondaryTextClass} font-medium transition-colors duration-300 truncate max-w-[150px]`}>{card.nickname || (isPreview ? "Card Nickname" : "")}</p>
+          <p className={`text-sm font-semibold tracking-wide transition-colors duration-300 ${primaryTextClass} truncate max-w-[180px]`}>
+            {card.card_name || (isPreview ? "Variant Name" : "")}
+          </p>
+          {(card.nickname || isPreview) && (
+            <p className={`text-[10px] ${secondaryTextClass} font-medium transition-colors duration-300 mt-1 truncate max-w-[150px] uppercase tracking-wider`}>
+              {card.nickname || (isPreview ? "Nickname" : "")}
+            </p>
           )}
         </div>
         <div className="flex flex-col items-end gap-1">
@@ -72,7 +77,7 @@ const CardVisual = ({ card, isPreview = false, onDelete }: { card: any, isPrevie
           <div className="space-y-1">
             <p className={`text-[9px] uppercase tracking-widest transition-colors duration-300 ${secondaryTextClass}`}>Card Holder</p>
             <p className={`text-sm font-semibold uppercase tracking-wider transition-colors duration-300 ${primaryTextClass} truncate max-w-[120px]`}>
-              {card.card_name || (isPreview ? 'JOHN DOE' : 'VALUED CUSTOMER')}
+              {card.card_holder || (isPreview ? 'NIKKI' : 'VALUED CUSTOMER')}
             </p>
           </div>
           <div className="space-y-1">
@@ -117,6 +122,7 @@ export default function Cards() {
   const [bankName, setBankName] = useState("");
   const [network, setNetwork] = useState("Visa");
   const [cardName, setCardName] = useState("");
+  const [cardHolder, setCardHolder] = useState("");
   const [expiryMonth, setExpiryMonth] = useState("");
   const [expiryYear, setExpiryYear] = useState("");
   const [billingDate, setBillingDate] = useState("");
@@ -127,7 +133,7 @@ export default function Cards() {
 
   const previewCardData = {
     nickname, last_four: lastFour, card_type: cardType,
-    bank_name: bankName, network, card_name: cardName,
+    bank_name: bankName, network, card_name: cardName, card_holder: cardHolder,
     expiry_month: expiryMonth, expiry_year: expiryYear,
     color_theme: colorTheme, status, credit_limit: creditLimit ? parseFloat(creditLimit) : null
   };
@@ -147,7 +153,7 @@ export default function Cards() {
 
   const resetForm = () => {
     setNickname(""); setLastFour(""); setCardType("Credit");
-    setBankName(""); setNetwork("Visa"); setCardName("");
+    setBankName(""); setNetwork("Visa"); setCardName(""); setCardHolder("");
     setExpiryMonth(""); setExpiryYear(""); setBillingDate("");
     setCreditLimit(""); setAvailableLimit(""); setStatus("Active"); setColorTheme("Blue");
   };
@@ -161,7 +167,7 @@ export default function Cards() {
     try {
       const payload = {
         nickname, last_four: lastFour, card_type: cardType,
-        bank_name: bankName, network, card_name: cardName,
+        bank_name: bankName, network, card_name: cardName, card_holder: cardHolder,
         expiry_month: expiryMonth, expiry_year: expiryYear,
         billing_date: billingDate ? parseInt(billingDate) : null,
         credit_limit: creditLimit ? parseFloat(creditLimit) : null,
@@ -267,15 +273,19 @@ export default function Cards() {
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Bank Name</Label>
-                      <Input placeholder="e.g. Chase" value={bankName} onChange={(e) => setBankName(e.target.value)} className="h-11 rounded-lg bg-black/20 border-white/10 hover:border-white/20 transition-colors focus-visible:ring-primary/50" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Last 4 Digits <span className="text-red-500">*</span></Label>
-                      <Input placeholder="1234" maxLength={4} minLength={4} required value={lastFour} onChange={(e) => setLastFour(e.target.value.replace(/\D/g, ''))} className="h-11 rounded-lg bg-black/20 border-white/10 hover:border-white/20 transition-colors focus-visible:ring-primary/50 font-mono tracking-widest text-center" />
+                      <Input placeholder="e.g. SBI" value={bankName} onChange={(e) => setBankName(e.target.value)} className="h-11 rounded-lg bg-black/20 border-white/10 hover:border-white/20 transition-colors focus-visible:ring-primary/50" />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Card Variant</Label>
-                      <Input placeholder="e.g. Millennia" value={cardName} onChange={(e) => setCardName(e.target.value)} className="h-11 rounded-lg bg-black/20 border-white/10 hover:border-white/20 transition-colors focus-visible:ring-primary/50" />
+                      <Input placeholder="e.g. Cashback+, Platinum" value={cardName} onChange={(e) => setCardName(e.target.value)} className="h-11 rounded-lg bg-black/20 border-white/10 hover:border-white/20 transition-colors focus-visible:ring-primary/50" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Card Holder Name</Label>
+                      <Input placeholder="e.g. NIKKI" value={cardHolder} onChange={(e) => setCardHolder(e.target.value.toUpperCase())} className="h-11 rounded-lg bg-black/20 border-white/10 hover:border-white/20 transition-colors focus-visible:ring-primary/50" />
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Last 4 Digits <span className="text-red-500">*</span></Label>
+                      <Input placeholder="1234" maxLength={4} minLength={4} required value={lastFour} onChange={(e) => setLastFour(e.target.value.replace(/\D/g, ''))} className="h-11 rounded-lg bg-black/20 border-white/10 hover:border-white/20 transition-colors focus-visible:ring-primary/50 font-mono tracking-widest text-center" />
                     </div>
                   </div>
                 </section>
