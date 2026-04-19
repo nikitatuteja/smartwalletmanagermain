@@ -42,6 +42,10 @@ def create_app(config_class=Config):
     def handle_exception(e):
         if isinstance(e, HTTPException):
             return jsonify({"success": False, "error": e.description}), e.code
+            
+        from flask_jwt_extended.exceptions import JWTExtendedException
+        if isinstance(e, JWTExtendedException):
+            return jsonify({"success": False, "error": "Login expired"}), 401
         
         # Log unexpected errors in development
         if app.debug:
@@ -57,11 +61,11 @@ def create_app(config_class=Config):
     @jwt.invalid_token_loader
     def invalid_token_callback(error):
         app.logger.error(f"JWT Invalid Token Error: {error}")
-        return jsonify({"success": False, "error": f"Authentication token is invalid: {str(error)}"}), 401
+        return jsonify({"success": False, "error": "Login expired"}), 401
     
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
-        return jsonify({"success": False, "error": "Authentication token has expired"}), 401
+        return jsonify({"success": False, "error": "Login expired"}), 401
 
     # Health Check
     @app.route('/api/health', methods=['GET'])
@@ -96,6 +100,21 @@ def create_app(config_class=Config):
                     db.session.add(user)
             
             db.session.commit()
+            
+            # Simple custom fallback auto-migrations for production schemas
+            from sqlalchemy import text
+            try:
+                db.session.execute(text('ALTER TABLE transactions ADD COLUMN payment_method VARCHAR(10) DEFAULT \'Cash\''))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                
+            try:
+                db.session.execute(text('ALTER TABLE transactions ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                
         except Exception as e:
             app.logger.error(f"Database initialization failed: {e}")
 

@@ -31,7 +31,7 @@ def get_transactions():
             "data": [t.to_dict() for t in transactions]
         }), 200
     except Exception as e:
-        return jsonify({"success": False, "error": "Unable to fetch transactions."}), 400
+        return jsonify({"success": False, "error": "Database unavailable"}), 400
 
 @transactions_bp.route('/', methods=['POST'], strict_slashes=False)
 @jwt_required()
