@@ -88,7 +88,7 @@ def add_transaction():
         }), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Database error: unable to process transaction data. Please ensure payload is valid."}), 400
 
 @transactions_bp.route('/<int:id>', methods=['PUT'], strict_slashes=False)
 @jwt_required()
@@ -154,7 +154,7 @@ def update_transaction(id):
         return jsonify({"success": True, "data": t.to_dict()}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Database error: unable to process transaction update. Please ensure payload is valid."}), 400
 
 @transactions_bp.route('/<int:id>', methods=['DELETE'], strict_slashes=False)
 @jwt_required()
@@ -170,5 +170,5 @@ def delete_transaction(id):
         return jsonify({"success": True, "message": "Transaction deleted"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Database error: unable to delete transaction."}), 400
 

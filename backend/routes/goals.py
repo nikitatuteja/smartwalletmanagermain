@@ -39,16 +39,20 @@ def add_goal():
         except ValueError:
             return jsonify({"success": False, "error": "Invalid date format. Use YYYY-MM-DD"}), 400
 
-    new_goal = Goal(
-        user_id=current_user_id,
-        name=name,
-        target_amount=target_amount,
-        current_amount=current_amount,
-        deadline=deadline
-    )
-    db.session.add(new_goal)
-    db.session.commit()
-    return jsonify({
-        "success": True,
-        "data": new_goal.to_dict()
-    }), 201
+    try:
+        new_goal = Goal(
+            user_id=current_user_id,
+            name=name,
+            target_amount=target_amount,
+            current_amount=current_amount,
+            deadline=deadline
+        )
+        db.session.add(new_goal)
+        db.session.commit()
+        return jsonify({
+            "success": True,
+            "data": new_goal.to_dict()
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": "Unable to save goal. Invalid data or duplicate constraints violated."}), 400

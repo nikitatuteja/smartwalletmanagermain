@@ -32,13 +32,17 @@ def add_budget():
     if not category or not amount:
         return jsonify({"success": False, "error": "Missing category or amount"}), 400
 
-    existing = Budget.query.filter_by(user_id=current_user_id, category=category, month=month).first()
-    if existing:
-        existing.amount = amount
-        db.session.commit()
-        return jsonify({"success": True, "data": existing.to_dict()}), 200
+    try:
+        existing = Budget.query.filter_by(user_id=current_user_id, category=category, month=month).first()
+        if existing:
+            existing.amount = amount
+            db.session.commit()
+            return jsonify({"success": True, "data": existing.to_dict()}), 200
 
-    new_budget = Budget(user_id=current_user_id, category=category, amount=amount, month=month)
-    db.session.add(new_budget)
-    db.session.commit()
-    return jsonify({"success": True, "data": new_budget.to_dict()}), 201
+        new_budget = Budget(user_id=current_user_id, category=category, amount=amount, month=month)
+        db.session.add(new_budget)
+        db.session.commit()
+        return jsonify({"success": True, "data": new_budget.to_dict()}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": "Unable to save budget. Please check category and limits."}), 400

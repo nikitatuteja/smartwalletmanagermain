@@ -36,15 +36,19 @@ def add_due():
     except ValueError:
         return jsonify({"success": False, "error": "Invalid date format. Use YYYY-MM-DD"}), 400
 
-    new_due = Due(
-        user_id=current_user_id,
-        amount=amount,
-        due_date=due_date,
-        card_id=card_id
-    )
-    db.session.add(new_due)
-    db.session.commit()
-    return jsonify({
-        "success": True,
-        "data": new_due.to_dict()
-    }), 201
+    try:
+        new_due = Due(
+            user_id=current_user_id,
+            amount=amount,
+            due_date=due_date,
+            card_id=card_id
+        )
+        db.session.add(new_due)
+        db.session.commit()
+        return jsonify({
+            "success": True,
+            "data": new_due.to_dict()
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": "Unable to save due. Ensure card details are valid."}), 400

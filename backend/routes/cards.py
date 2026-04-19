@@ -99,7 +99,7 @@ def add_card():
         db.session.rollback()
         # Logging error
         print(f"[ERROR] Failed to save card: {str(e)}")
-        return jsonify({"success": False, "error": "An unexpected internal server error occurred."}), 500
+        return jsonify({"success": False, "error": "Unable to save card. Database constraints violated or invalid payload."}), 400
 
 @cards_bp.route('/<int:card_id>', methods=['DELETE'], strict_slashes=False)
 @jwt_required()
@@ -110,10 +110,14 @@ def delete_card(card_id):
     if not card:
         return jsonify({"success": False, "error": "Card not found"}), 404
         
-    db.session.delete(card)
-    db.session.commit()
-    
-    return jsonify({
-        "success": True,
-        "message": "Card deleted successfully"
-    }), 200
+    try:
+        db.session.delete(card)
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "message": "Card deleted successfully"
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": "Unable to delete card due to database dependencies."}), 400

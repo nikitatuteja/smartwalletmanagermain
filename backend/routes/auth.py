@@ -17,13 +17,17 @@ def register():
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "Email address already exists"}), 409
 
-    new_user = User(email=email, display_name=display_name)
-    new_user.set_password(password)
-    db.session.add(new_user)
-    db.session.commit()
+    try:
+        new_user = User(email=email, display_name=display_name)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
 
-    access_token = create_access_token(identity=str(new_user.id))
-    return jsonify(access_token=access_token, user=new_user.to_dict(), success=True), 201
+        access_token = create_access_token(identity=str(new_user.id))
+        return jsonify(access_token=access_token, user=new_user.to_dict(), success=True), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": "Email address already exists or invalid data"}), 400
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
