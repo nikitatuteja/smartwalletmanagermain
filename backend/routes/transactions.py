@@ -13,22 +13,25 @@ EXPENSE_CATEGORIES = ["Food", "Fuel", "Rent", "Shopping", "Utilities", "Entertai
 @jwt_required()
 def get_transactions():
     current_user_id = get_jwt_identity()
-    query = Transaction.query.filter_by(user_id=current_user_id)
-    
-    t_type = request.args.get('type')
-    category = request.args.get('category')
-    
-    if t_type:
-        query = query.filter_by(type=t_type)
-    if category:
-        query = query.filter_by(category=category)
+    try:
+        query = Transaction.query.filter_by(user_id=current_user_id)
         
-    transactions = query.order_by(Transaction.date.desc(), Transaction.created_at.desc()).all()
-    
-    return jsonify({
-        "success": True,
-        "data": [t.to_dict() for t in transactions]
-    }), 200
+        t_type = request.args.get('type')
+        category = request.args.get('category')
+        
+        if t_type:
+            query = query.filter_by(type=t_type)
+        if category:
+            query = query.filter_by(category=category)
+            
+        transactions = query.order_by(Transaction.date.desc(), Transaction.created_at.desc()).all()
+        
+        return jsonify({
+            "success": True,
+            "data": [t.to_dict() for t in transactions]
+        }), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": "Unable to fetch transactions."}), 400
 
 @transactions_bp.route('/', methods=['POST'], strict_slashes=False)
 @jwt_required()

@@ -47,7 +47,7 @@ def create_app(config_class=Config):
         if app.debug:
             app.logger.error(f"Server Error: {traceback.format_exc()}")
             
-        return jsonify({"success": False, "error": "An unexpected internal server error occurred."}), 500
+        return jsonify({"success": False, "error": "A server processing error occurred. Please verify your data and try again."}), 400
 
     # Custom JWTExtended error handlers
     @jwt.unauthorized_loader

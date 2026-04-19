@@ -48,7 +48,8 @@ export default function Dashboard() {
         type: "Expense",
         category: quickPayCategory,
         notes: quickPayNotes || `Quick Payment for ${quickPayCategory}`,
-        date: new Date().toISOString()
+        date: new Date().toISOString().split("T")[0],
+        payment_method: "UPI"
       });
       if (res.success) {
         toast.success("Payment recorded successfully!");
