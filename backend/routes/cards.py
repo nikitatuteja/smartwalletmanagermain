@@ -8,12 +8,15 @@ cards_bp = Blueprint('cards', __name__)
 @cards_bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_cards():
-    current_user_id = get_jwt_identity()
-    cards = Card.query.filter_by(user_id=current_user_id).all()
-    return jsonify({
-        "success": True,
-        "data": [c.to_dict() for c in cards]
-    }), 200
+    try:
+        current_user_id = get_jwt_identity()
+        cards = Card.query.filter_by(user_id=current_user_id).all()
+        return jsonify({
+            "success": True,
+            "data": [c.to_dict() for c in cards]
+        }), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": "Unable to fetch cards data."}), 400
 
 @cards_bp.route('/', methods=['POST'], strict_slashes=False)
 @jwt_required()
