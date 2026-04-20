@@ -50,8 +50,10 @@ def create_app(config_class=Config):
         # Log unexpected errors in development
         if app.debug:
             app.logger.error(f"Server Error: {traceback.format_exc()}")
+        else:
+            app.logger.error(f"Server Error: {e}")
             
-        return jsonify({"success": False, "error": "A server processing error occurred. Please verify your data and try again."}), 400
+        return jsonify({"success": False, "error": "Internal server error. Please try again later."}), 500
 
     # Custom JWTExtended error handlers
     @jwt.unauthorized_loader
@@ -114,6 +116,28 @@ def create_app(config_class=Config):
                 db.session.commit()
             except Exception:
                 db.session.rollback()
+                
+            # CARD MODEL AUTO-MIGRATIONS (Backwards Compatibility)
+            card_columns = [
+                "bank_name VARCHAR(100)",
+                "network VARCHAR(50)",
+                "card_name VARCHAR(100)",
+                "card_holder VARCHAR(100)",
+                "expiry_month VARCHAR(2)",
+                "expiry_year VARCHAR(4)",
+                "billing_date INTEGER",
+                "credit_limit FLOAT",
+                "available_limit FLOAT",
+                "status VARCHAR(20) DEFAULT 'Active'",
+                "color_theme VARCHAR(20) DEFAULT 'Blue'"
+            ]
+            
+            for col in card_columns:
+                try:
+                    db.session.execute(text(f'ALTER TABLE cards ADD COLUMN {col}'))
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback()
                 
         except Exception as e:
             app.logger.error(f"Database initialization failed: {e}")

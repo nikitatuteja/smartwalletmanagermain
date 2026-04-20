@@ -31,7 +31,7 @@ class User(db.Model):
             "email": self.email,
             "display_name": self.display_name,
             "role": self.role,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
         }
 
 class Card(db.Model):
@@ -79,7 +79,7 @@ class Card(db.Model):
             "available_limit": self.available_limit,
             "status": self.status,
             "color_theme": self.color_theme,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
         }
 
 class Transaction(db.Model):
@@ -102,11 +102,11 @@ class Transaction(db.Model):
             "amount": self.amount,
             "type": self.type,
             "category": self.category,
-            "date": self.date.isoformat() if self.date else None,
+            "date": self.date.isoformat() if hasattr(self, 'date') and self.date else None,
             "payment_method": self.payment_method,
             "notes": self.notes,
             "card_id": self.card_id,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
         }
 
 class Due(db.Model):
@@ -121,16 +121,20 @@ class Due(db.Model):
 
     def to_dict(self):
         today = date.today()
-        is_overdue = self.due_date < today and not self.is_paid
+        # Prevent crash if due_date is None
+        is_overdue = False
+        if hasattr(self, 'due_date') and self.due_date:
+            is_overdue = self.due_date < today and not self.is_paid
+            
         return {
             "id": self.id,
             "user_id": self.user_id,
             "card_id": self.card_id,
             "amount": self.amount,
-            "due_date": self.due_date.isoformat() if self.due_date else None,
+            "due_date": self.due_date.isoformat() if hasattr(self, 'due_date') and self.due_date else None,
             "is_paid": self.is_paid,
             "is_overdue": is_overdue,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
         }
 
 class Budget(db.Model):
@@ -149,7 +153,7 @@ class Budget(db.Model):
             "category": self.category,
             "amount": self.amount,
             "month": self.month,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
         }
 
 class Goal(db.Model):
@@ -169,6 +173,6 @@ class Goal(db.Model):
             "name": self.name,
             "target_amount": self.target_amount,
             "current_amount": self.current_amount,
-            "deadline": self.deadline.isoformat() if self.deadline else None,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "deadline": self.deadline.isoformat() if hasattr(self, 'deadline') and self.deadline else None,
+            "created_at": self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
         }
