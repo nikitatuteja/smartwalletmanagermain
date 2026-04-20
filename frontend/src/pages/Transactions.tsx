@@ -98,6 +98,12 @@ export default function Transactions() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!category) {
+      toast.error("Please select a category");
+      return;
+    }
+
     const payload = { 
       amount: parseFloat(amount), 
       type, 

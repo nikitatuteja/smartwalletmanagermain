@@ -31,7 +31,7 @@ def get_transactions():
             "data": [t.to_dict() for t in transactions]
         }), 200
     except Exception as e:
-        return jsonify({"success": False, "error": "Database unavailable"}), 400
+        return jsonify({"success": False, "error": "Internal Server Error"}), 500
 
 @transactions_bp.route('/', methods=['POST'], strict_slashes=False)
 @jwt_required()
@@ -47,7 +47,14 @@ def add_transaction():
     date_str = data.get('date')
     payment_method = data.get('payment_method')
     notes = data.get('notes')
-    card_id = data.get('card_id')
+    
+    card_id_raw = data.get('card_id')
+    card_id = None
+    if card_id_raw and str(card_id_raw).strip() != "":
+        try:
+            card_id = int(card_id_raw)
+        except ValueError:
+            return jsonify({"success": False, "error": "Invalid card ID"}), 400
 
     if amount is None or amount <= 0:
         return jsonify({"success": False, "error": "Valid positive amount is required"}), 400
@@ -91,7 +98,7 @@ def add_transaction():
         }), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": "Database error: unable to process transaction data. Please ensure payload is valid."}), 400
+        raise e
 
 @transactions_bp.route('/<int:id>', methods=['PUT'], strict_slashes=False)
 @jwt_required()
@@ -111,7 +118,17 @@ def update_transaction(id):
     date_str = data.get('date')
     payment_method = data.get('payment_method')
     notes = data.get('notes')
-    card_id = data.get('card_id')
+    
+    card_id_raw = data.get('card_id')
+    card_id = None
+    if card_id_raw is not None:
+        if str(card_id_raw).strip() == "":
+            card_id = None
+        else:
+            try:
+                card_id = int(card_id_raw)
+            except ValueError:
+                return jsonify({"success": False, "error": "Invalid card ID"}), 400
     
     if amount is not None:
         if amount <= 0:
@@ -125,9 +142,9 @@ def update_transaction(id):
         
     if category:
         t_type_check = t.type
-        if t_type == "Income" and category not in INCOME_CATEGORIES:
+        if t_type_check == "Income" and category not in INCOME_CATEGORIES:
             return jsonify({"success": False, "error": f"Invalid category: '{category}' for type '{t_type_check}'"}), 400
-        if t_type == "Expense" and category not in EXPENSE_CATEGORIES:
+        if t_type_check == "Expense" and category not in EXPENSE_CATEGORIES:
             return jsonify({"success": False, "error": f"Invalid category: '{category}' for type '{t_type_check}'"}), 400
         t.category = category
         
@@ -157,7 +174,7 @@ def update_transaction(id):
         return jsonify({"success": True, "data": t.to_dict()}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": "Database error: unable to process transaction update. Please ensure payload is valid."}), 400
+        raise e
 
 @transactions_bp.route('/<int:id>', methods=['DELETE'], strict_slashes=False)
 @jwt_required()
@@ -173,5 +190,5 @@ def delete_transaction(id):
         return jsonify({"success": True, "message": "Transaction deleted"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": "Database error: unable to delete transaction."}), 400
+        raise e
 

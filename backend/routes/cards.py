@@ -16,7 +16,7 @@ def get_cards():
             "data": [c.to_dict() for c in cards]
         }), 200
     except Exception as e:
-        return jsonify({"success": False, "error": "Unable to fetch cards data."}), 400
+        raise e
 
 @cards_bp.route('/', methods=['POST'], strict_slashes=False)
 @jwt_required()
@@ -100,9 +100,7 @@ def add_card():
 
     except Exception as e:
         db.session.rollback()
-        # Logging error
-        print(f"[ERROR] Failed to save card: {str(e)}")
-        return jsonify({"success": False, "error": "Unable to save card. Database constraints violated or invalid payload."}), 400
+        raise e
 
 @cards_bp.route('/<int:card_id>', methods=['DELETE'], strict_slashes=False)
 @jwt_required()
@@ -123,4 +121,4 @@ def delete_card(card_id):
         }), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": "Unable to delete card due to database dependencies."}), 400
+        raise e

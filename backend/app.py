@@ -117,6 +117,18 @@ def create_app(config_class=Config):
             except Exception:
                 db.session.rollback()
                 
+            try:
+                db.session.execute(text('ALTER TABLE transactions ADD COLUMN card_id INTEGER'))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                
+            try:
+                db.session.execute(text('ALTER TABLE transactions ADD COLUMN notes VARCHAR(500)'))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                
             # CARD MODEL AUTO-MIGRATIONS (Backwards Compatibility)
             card_columns = [
                 "bank_name VARCHAR(100)",

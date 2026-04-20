@@ -260,7 +260,7 @@ export default function Dashboard() {
                       <p className="text-base">
                         You made <span className="text-[#5B5BD6] font-bold text-lg">{data?.transaction_count}</span> transactions this month.
                       </p>
-                      {data?.top_category && (
+                      {data?.top_category && data.top_category !== "None" && (
                         <p className="text-base">
                           You spent most on <span className="text-red-400 font-bold text-lg">{data?.top_category}</span> this month.
                         </p>

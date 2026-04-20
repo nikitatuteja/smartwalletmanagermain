@@ -51,4 +51,55 @@ def add_due():
         }), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": "Unable to save due. Ensure card details are valid."}), 400
+        raise e
+
+@dues_bp.route('/<int:id>', methods=['PUT'], strict_slashes=False)
+@jwt_required()
+def update_due(id):
+    current_user_id = get_jwt_identity()
+    due = Due.query.filter_by(id=id, user_id=current_user_id).first()
+    if not due:
+        return jsonify({"success": False, "error": "Due not found"}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "error": "No data provided"}), 400
+
+    if 'is_paid' in data:
+        due.is_paid = data['is_paid']
+
+    if 'amount' in data:
+        due.amount = data['amount']
+
+    if 'due_date' in data:
+        try:
+            due.due_date = datetime.strptime(data['due_date'], '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"success": False, "error": "Invalid date format. Use YYYY-MM-DD"}), 400
+
+    if 'card_id' in data:
+        due.card_id = data['card_id']
+
+    try:
+        db.session.commit()
+        return jsonify({"success": True, "data": due.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()
+        raise e
+
+@dues_bp.route('/<int:id>', methods=['DELETE'], strict_slashes=False)
+@jwt_required()
+def delete_due(id):
+    current_user_id = get_jwt_identity()
+    due = Due.query.filter_by(id=id, user_id=current_user_id).first()
+    
+    if not due:
+        return jsonify({"success": False, "error": "Due not found"}), 404
+        
+    try:
+        db.session.delete(due)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Due deleted successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        raise e
